@@ -193,24 +193,10 @@ def accessibility_score(html, findings):
             'note':'Basic indicator from the listed static checks only. This is not a WCAG compliance score.'}
 
 
-def safety_signals(url):
-    parts = urlsplit(url)
-    host = parts.hostname or ''
-    signals = []
-    if parts.scheme == 'http': signals.append('Uses HTTP instead of HTTPS.')
-    if re.fullmatch(r'\d+\.\d+\.\d+\.\d+', host): signals.append('Uses an IP address instead of a domain name.')
-    if host.count('.') >= 4: signals.append('Has many subdomains; check the actual domain carefully.')
-    if len(url) > 150: signals.append('URL is unusually long; verify its destination.')
-    if 'xn--' in host: signals.append('Uses an internationalized domain encoding; verify the spelling.')
-    return {'status': 'Caution' if signals else 'No simple URL warnings', 'signals': signals, 'note': 'These URL signals cannot establish whether a site is safe. No phishing model or malware scan is included.'}
-
-
 def scan(url):
     normalized = validate_url(url)
     # Validate before any request. These signals do not authorize navigation.
     public_addresses(urlsplit(normalized).hostname)
     final_url, html = fetch_page(normalized)
     findings = accessibility_findings(html)
-    return {'url':final_url,'findings':findings,'score':accessibility_score(html, findings),
-            'safety':safety_signals(final_url),
-            'method':'Static HTML checks; dynamic content and manual accessibility checks are not covered.'}
+    return {'url':final_url,'findings':findings,'score':accessibility_score(html, findings),'method':'Static HTML checks; dynamic content and manual accessibility checks are not covered.'}

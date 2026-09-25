@@ -1,23 +1,979 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OpenAccess | Accessibility Checker</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OpenAccess | Accessibility Checker</title>
+
 <style>
-:root{font-family:Inter,system-ui,sans-serif;color:#e8ecf4;background:#101827}*{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #6de1dc;outline-offset:3px}a{color:#78ddd5}.shell{max-width:1120px;margin:auto;padding:28px 24px 80px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #344056;padding-bottom:20px}.logo{font-weight:800;font-size:1.25rem;letter-spacing:-.03em}.logo span{color:#70dbd0}nav{display:flex;gap:22px}.eyebrow{color:#78ddd5;font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-size:.75rem;margin:56px 0 12px}h1{font-size:clamp(2rem,5vw,3.6rem);letter-spacing:-.05em;line-height:1.07;max-width:760px;margin:0}h1 em{color:#80ddd1;font-style:normal}.lead{color:#aab6c9;max-width:680px;line-height:1.6}.panel{border:1px solid #344056;background:#192438;border-radius:16px;padding:24px;margin-top:26px}.scanrow{display:flex;gap:12px;margin-top:10px}.scanrow input{flex:1;min-width:0;border:1px solid #526078;border-radius:9px;background:#101827;color:#fff;padding:14px}.primary{background:#76ded1;border:0;border-radius:9px;color:#12202b;font-weight:800;padding:13px 22px}.primary:disabled{opacity:.6;cursor:wait}.muted{color:#aab6c9;font-size:.9rem}.error{color:#ffb9b9}h2{font-size:1.35rem}h3{margin:0 0 8px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{background:#101827;border:1px solid #344056;border-radius:12px;padding:18px}.stat strong{display:block;font-size:2rem}.score{display:flex;align-items:center;gap:18px;padding:20px;border-radius:12px;background:#132c35;border:1px solid #32736f;margin:18px 0}.score strong{font-size:2.7rem;color:#9be8df}.score span{color:#c8e5e2}.stat span{color:#aab6c9}.finding{border-top:1px solid #344056;padding:19px 0}.finding:first-child{border-top:0}.badge{display:inline-block;border-radius:50px;padding:4px 9px;font-size:.77rem;font-weight:800;margin-right:10px;background:#364252}.critical{color:#ffb9b9}.serious{color:#ffd1a0}.moderate{color:#ffebaa}.finding code{display:inline-block;background:#101827;padding:4px 7px;border-radius:5px;overflow-wrap:anywhere}.finding p{margin:7px 0;color:#c1ccda}.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.secondary{background:transparent;color:#e8ecf4;border:1px solid #6a798e;border-radius:8px;padding:8px 12px}.historyitem{border-top:1px solid #344056;padding:12px 0;display:flex;justify-content:space-between;gap:12px}.historyitem button{background:none;color:#9de4dc;border:0;text-decoration:underline}.historyitem span{overflow-wrap:anywhere}.hidden{display:none}@media(max-width:650px){header{align-items:flex-start;gap:12px;flex-direction:column}.scanrow{flex-direction:column}.stats{grid-template-columns:repeat(2,1fr)}.shell{padding:18px 16px 60px}}
-</style></head><body><div class="shell">
-<header><div class="logo">OPEN<span>ACCESS</span> <small class="muted">/ Campus edition</small></div><nav><a href="#scanner">Scan</a><a href="#history">History</a><a href="#about">About</a></nav></header>
-<main><p class="eyebrow">Web accessibility made visible</p><h1>Find barriers. <em>Build a better web.</em></h1><p class="lead">Scan a public webpage for common accessibility issues, see the affected elements, and learn how to fix them. A separate URL check highlights a few basic warning signs.</p>
-<section class="panel" id="scanner" aria-labelledby="scan-title"><h2 id="scan-title">Scan a webpage</h2><form id="scanform"><label for="url">Public webpage URL</label><div class="scanrow"><input id="url" type="url" required placeholder="https://example.org" autocomplete="url"><button class="primary" id="scanbtn">Run accessibility scan</button></div></form><button class="secondary" id="demo" type="button">Try built-in example</button><p class="muted">Static HTML checks. This starter does not analyze JavaScript-rendered content or certify WCAG compliance.</p><p role="status" id="status" aria-live="polite"></p></section>
-<section class="panel hidden" id="results" aria-labelledby="results-title"><div class="toolbar"><div><h2 id="results-title">Accessibility findings</h2><p class="muted" id="result-url"></p></div><div><button class="secondary" id="export" type="button">Download JSON</button> <button class="secondary" id="csv" type="button">Download CSV</button></div></div><div id="score"></div><div class="stats" id="stats"></div><p class="muted" id="method"></p><div id="findings"></div><h2>URL safety signals</h2><div id="safety"></div></section>
-<section class="panel" id="history" aria-labelledby="history-title"><div class="toolbar"><h2 id="history-title">Scan history</h2><button class="secondary" id="clear" type="button">Clear history</button></div><p class="muted">Stored only in this browser. Open a past scan to view its saved report.</p><div id="historylist"></div></section>
-<section class="panel" id="about"><h2>What this scanner checks</h2><p class="muted">Page titles, declared language, image alternatives, form labels, button and link names, and headings. Review keyboard navigation, focus, reading order, content quality, and visual contrast manually. A page with zero findings still needs human review.</p></section></main></div>
+:root{font-family:Inter,system-ui,sans-serif;color:#e8ecf4;background:#101827}
+*{box-sizing:border-box}
+body{margin:0}
+button,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{
+  outline:3px solid #6de1dc;
+  outline-offset:3px
+}
+a{color:#78ddd5}
+.shell{max-width:1120px;margin:auto;padding:28px 24px 80px}
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #344056;
+  padding-bottom:20px
+}
+.logo{font-weight:800;font-size:1.25rem;letter-spacing:-.03em}
+.logo span{color:#70dbd0}
+nav{display:flex;gap:22px}
+.eyebrow{
+  color:#78ddd5;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  font-size:.75rem;
+  margin:56px 0 12px
+}
+h1{
+  font-size:clamp(2rem,5vw,3.6rem);
+  letter-spacing:-.05em;
+  line-height:1.07;
+  max-width:760px;
+  margin:0
+}
+h1 em{color:#80ddd1;font-style:normal}
+.lead{color:#aab6c9;max-width:680px;line-height:1.6}
+.panel{
+  border:1px solid #344056;
+  background:#192438;
+  border-radius:16px;
+  padding:24px;
+  margin-top:26px
+}
+.scanrow{display:flex;gap:12px;margin-top:10px}
+.scanrow input{
+  flex:1;
+  min-width:0;
+  border:1px solid #526078;
+  border-radius:9px;
+  background:#101827;
+  color:#fff;
+  padding:14px
+}
+.primary{
+  background:#76ded1;
+  border:0;
+  border-radius:9px;
+  color:#12202b;
+  font-weight:800;
+  padding:13px 22px
+}
+.primary:disabled{opacity:.6;cursor:wait}
+.muted{color:#aab6c9;font-size:.9rem}
+.error{color:#ffb9b9}
+h2{font-size:1.35rem}
+h3{margin:0 0 8px}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px
+}
+.stat{
+  background:#101827;
+  border:1px solid #344056;
+  border-radius:12px;
+  padding:18px
+}
+.stat strong{display:block;font-size:2rem}
+.score{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:20px;
+  border-radius:12px;
+  background:#132c35;
+  border:1px solid #32736f;
+  margin:18px 0
+}
+.score strong{font-size:2.7rem;color:#9be8df}
+.score span{color:#c8e5e2}
+.stat span{color:#aab6c9}
+.finding{
+  border-top:1px solid #344056;
+  padding:19px 0
+}
+.finding:first-child{border-top:0}
+.badge{
+  display:inline-block;
+  border-radius:50px;
+  padding:4px 9px;
+  font-size:.77rem;
+  font-weight:800;
+  margin-right:10px;
+  background:#364252
+}
+.critical{color:#ffb9b9}
+.serious{color:#ffd1a0}
+.moderate{color:#ffebaa}
+.finding code{
+  display:inline-block;
+  background:#101827;
+  padding:4px 7px;
+  border-radius:5px;
+  overflow-wrap:anywhere
+}
+.finding p{margin:7px 0;color:#c1ccda}
+.toolbar{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap
+}
+.secondary{
+  background:transparent;
+  color:#e8ecf4;
+  border:1px solid #6a798e;
+  border-radius:8px;
+  padding:8px 12px
+}
+.historyitem{
+  border-top:1px solid #344056;
+  padding:12px 0;
+  display:flex;
+  justify-content:space-between;
+  gap:12px
+}
+.historyitem button{
+  background:none;
+  color:#9de4dc;
+  border:0;
+  text-decoration:underline
+}
+.historyitem span{overflow-wrap:anywhere}
+.hidden{display:none}
+
+@media(max-width:650px){
+  header{
+    align-items:flex-start;
+    gap:12px;
+    flex-direction:column
+  }
+
+  .scanrow{flex-direction:column}
+
+  .stats{
+    grid-template-columns:repeat(2,1fr)
+  }
+
+  .shell{
+    padding:18px 16px 60px
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="shell">
+
+<header>
+  <div class="logo">
+    OPEN<span>ACCESS</span>
+    <small class="muted">/ Campus edition</small>
+  </div>
+
+  <nav>
+    <a href="#scanner">Scan</a>
+    <a href="#history">History</a>
+    <a href="#about">About</a>
+  </nav>
+</header>
+
+<main>
+
+<p class="eyebrow">Web accessibility made visible</p>
+
+<h1>
+  Find barriers.
+  <em>Build a better web.</em>
+</h1>
+
+<p class="lead">
+  Scan a public webpage for common accessibility issues, see the affected
+  elements, and learn how to fix them. A separate URL check highlights a few
+  basic warning signs.
+</p>
+
+
+<!-- SCANNER -->
+
+<section class="panel" id="scanner" aria-labelledby="scan-title">
+
+  <h2 id="scan-title">Scan a webpage</h2>
+
+  <form id="scanform">
+
+    <label for="url">Public webpage URL</label>
+
+    <div class="scanrow">
+
+      <input
+        id="url"
+        type="url"
+        required
+        placeholder="https://example.org"
+        autocomplete="url"
+      >
+
+      <button
+        class="primary"
+        id="scanbtn"
+        type="submit"
+      >
+        Run accessibility scan
+      </button>
+
+    </div>
+
+  </form>
+
+  <button
+    class="secondary"
+    id="demo"
+    type="button"
+  >
+    Try built-in example
+  </button>
+
+  <p class="muted">
+    Static HTML checks. This starter does not analyze JavaScript-rendered
+    content or certify WCAG compliance.
+  </p>
+
+  <p
+    role="status"
+    id="status"
+    aria-live="polite"
+  ></p>
+
+</section>
+
+
+<!-- RESULTS -->
+
+<section
+  class="panel hidden"
+  id="results"
+  aria-labelledby="results-title"
+>
+
+  <div class="toolbar">
+
+    <div>
+      <h2 id="results-title">Accessibility findings</h2>
+      <p class="muted" id="result-url"></p>
+    </div>
+
+    <div>
+
+      <button
+        class="secondary"
+        id="export"
+        type="button"
+      >
+        Download JSON
+      </button>
+
+      <button
+        class="secondary"
+        id="csv"
+        type="button"
+      >
+        Download CSV
+      </button>
+
+    </div>
+
+  </div>
+
+  <div id="score"></div>
+
+  <div class="stats" id="stats"></div>
+
+  <p class="muted" id="method"></p>
+
+  <div id="findings"></div>
+
+</section>
+
+
+<!-- HISTORY -->
+
+<section
+  class="panel"
+  id="history"
+  aria-labelledby="history-title"
+>
+
+  <div class="toolbar">
+
+    <h2 id="history-title">Scan history</h2>
+
+    <button
+      class="secondary"
+      id="clear"
+      type="button"
+    >
+      Clear history
+    </button>
+
+  </div>
+
+  <p class="muted">
+    Stored only in this browser. Open a past scan to view its saved report.
+  </p>
+
+  <div id="historylist"></div>
+
+</section>
+
+
+<!-- ABOUT -->
+
+<section
+  class="panel"
+  id="about"
+>
+
+  <h2>What this scanner checks</h2>
+
+  <p class="muted">
+    Page titles, declared language, image alternatives, form labels,
+    button and link names, and headings. Review keyboard navigation,
+    focus, reading order, content quality, and visual contrast manually.
+    A page with zero findings still needs human review.
+  </p>
+
+</section>
+
+</main>
+</div>
+
+
 <script>
-const $=id=>document.getElementById(id), key='openaccess-history-v1';let current=null;let history=[];try{history=JSON.parse(localStorage.getItem(key)||'[]');if(!Array.isArray(history))history=[]}catch{history=[]}
-function el(tag,content,cls){const node=document.createElement(tag);if(content!==undefined)node.textContent=String(content);if(cls)node.className=cls;return node}
-function save(){try{localStorage.setItem(key,JSON.stringify(history.slice(0,20)))}catch{$('status').textContent='History could not be saved in this browser.'}}
-function renderHistory(){const box=$('historylist');box.replaceChildren();if(!history.length){box.append(el('p','No scans yet.','muted'));return}history.forEach((row,i)=>{let div=el('div',undefined,'historyitem');let span=el('span',new Date(row.at).toLocaleString()+' · '+row.report.url+' · '+row.report.findings.length+' findings');let btn=el('button','View report');btn.type='button';btn.addEventListener('click',()=>{renderReport(row.report);$('results').scrollIntoView({behavior:'smooth'})});div.append(span,btn);box.append(div)})}
-function renderReport(data){current=data;$('results').classList.remove('hidden');$('result-url').textContent=data.url;$('method').textContent=data.method;const counts={critical:0,serious:0,moderate:0,minor:0};for(const f of data.findings)counts[f.impact]=(counts[f.impact]||0)+1;const score=$('score');score.replaceChildren();if(data.score){const card=el('div',undefined,'score');card.append(el('strong',data.score.value===null?'N/A':data.score.value+'%'));const detail=el('div');detail.append(el('b',data.score.passed+' of '+data.score.applicable+' applicable categories passed'),el('p',data.score.note,'muted'));card.append(detail);score.append(card)}const stats=$('stats');stats.replaceChildren();for(const [label,count] of Object.entries(counts)){let card=el('div',undefined,'stat');card.append(el('strong',count),el('span',label));stats.append(card)}const list=$('findings');list.replaceChildren();if(!data.findings.length)list.append(el('p','No issues detected by these automated checks. Manual testing is still needed.','muted'));for(const f of data.findings){const row=el('article',undefined,'finding');const title=el('h3');title.append(el('span',f.impact,'badge '+f.impact),document.createTextNode(f.rule));row.append(title,el('code',f.element),el('p',f.message),el('p','Suggested fix: '+f.fix));list.append(row)}const safe=$('safety');safe.replaceChildren();safe.append(el('h3',data.safety.status));for(const item of data.safety.signals)safe.append(el('p',item,'muted'));safe.append(el('p',data.safety.note,'muted'))}
-$('scanform').addEventListener('submit',async e=>{e.preventDefault();const btn=$('scanbtn');btn.disabled=true;$('status').textContent='Scanning webpage…';$('status').className='';try{const res=await fetch('/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:$('url').value})});const data=await res.json();if(!res.ok)throw new Error(data.error||'Scan failed');renderReport(data);history.unshift({at:new Date().toISOString(),report:data});history=history.slice(0,20);save();renderHistory();$('status').textContent=`Scan complete: ${data.findings.length} findings.`;$('results').scrollIntoView({behavior:'smooth'})}catch(err){$('status').textContent=err.message;$('status').className='error'}finally{btn.disabled=false}});
-$('demo').addEventListener('click',async()=>{const btn=$('demo');btn.disabled=true;$('status').textContent='Scanning bundled example…';try{const res=await fetch('/api/demo',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});const data=await res.json();if(!res.ok)throw new Error(data.error);renderReport(data);$('status').textContent=`Example complete: ${data.findings.length} findings.`;$('results').scrollIntoView({behavior:'smooth'})}catch(err){$('status').textContent=err.message}finally{btn.disabled=false}});
-$('export').addEventListener('click',()=>{if(!current)return;const file=new Blob([JSON.stringify(current,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download='accessibility-report.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
-$('csv').addEventListener('click',()=>{if(!current)return;const quote=v=>{let cell=String(v??'');if(/^[\s]*[=+@-]/.test(cell))cell="'"+cell;return '"'+cell.replaceAll('"','""')+'"'};const rows=[['URL','Basic score','Rule','Severity','Element','Issue','Suggested fix'].map(quote).join(',')];for(const f of current.findings)rows.push([current.url,current.score?.value??'',f.rule,f.impact,f.element,f.message,f.fix].map(quote).join(','));const blob=new Blob(['\uFEFF'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='accessibility-report.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
-$('clear').addEventListener('click',()=>{if(!confirm('Clear saved scan history?'))return;history=[];save();renderHistory()});renderHistory();
-</script></body></html>
+
+const $ = id => document.getElementById(id);
+
+const key = 'openaccess-history-v1';
+
+let current = null;
+let history = [];
+
+
+/* LOAD HISTORY */
+
+try {
+
+  history = JSON.parse(
+    localStorage.getItem(key) || '[]'
+  );
+
+  if (!Array.isArray(history)) {
+    history = [];
+  }
+
+} catch {
+
+  history = [];
+
+}
+
+
+/* CREATE ELEMENT */
+
+function el(tag, content, cls) {
+
+  const node = document.createElement(tag);
+
+  if (content !== undefined) {
+    node.textContent = String(content);
+  }
+
+  if (cls) {
+    node.className = cls;
+  }
+
+  return node;
+}
+
+
+/* SAVE HISTORY */
+
+function save() {
+
+  try {
+
+    localStorage.setItem(
+      key,
+      JSON.stringify(history.slice(0, 20))
+    );
+
+  } catch {
+
+    $('status').textContent =
+      'History could not be saved in this browser.';
+
+  }
+
+}
+
+
+/* RENDER HISTORY */
+
+function renderHistory() {
+
+  const box = $('historylist');
+
+  box.replaceChildren();
+
+  if (!history.length) {
+
+    box.append(
+      el(
+        'p',
+        'No scans yet.',
+        'muted'
+      )
+    );
+
+    return;
+  }
+
+  history.forEach((row) => {
+
+    const div = el(
+      'div',
+      undefined,
+      'historyitem'
+    );
+
+    const span = el(
+      'span',
+      new Date(row.at).toLocaleString() +
+      ' · ' +
+      row.report.url +
+      ' · ' +
+      row.report.findings.length +
+      ' findings'
+    );
+
+    const btn = el(
+      'button',
+      'View report'
+    );
+
+    btn.type = 'button';
+
+    btn.addEventListener(
+      'click',
+      () => {
+
+        renderReport(row.report);
+
+        $('results').scrollIntoView({
+          behavior: 'smooth'
+        });
+
+      }
+    );
+
+    div.append(span, btn);
+
+    box.append(div);
+
+  });
+
+}
+
+
+/* RENDER REPORT */
+
+function renderReport(data) {
+
+  current = data;
+
+  $('results').classList.remove('hidden');
+
+  $('result-url').textContent =
+    data.url || '';
+
+  $('method').textContent =
+    data.method || '';
+
+
+  /* FINDING COUNTS */
+
+  const counts = {
+    critical: 0,
+    serious: 0,
+    moderate: 0,
+    minor: 0
+  };
+
+  for (const f of (data.findings || [])) {
+
+    counts[f.impact] =
+      (counts[f.impact] || 0) + 1;
+
+  }
+
+
+  /* SCORE */
+
+  const score = $('score');
+
+  score.replaceChildren();
+
+  if (data.score) {
+
+    const card = el(
+      'div',
+      undefined,
+      'score'
+    );
+
+    card.append(
+      el(
+        'strong',
+        data.score.value === null
+          ? 'N/A'
+          : data.score.value + '%'
+      )
+    );
+
+    const detail = el('div');
+
+    detail.append(
+      el(
+        'b',
+        data.score.passed +
+        ' of ' +
+        data.score.applicable +
+        ' applicable categories passed'
+      ),
+
+      el(
+        'p',
+        data.score.note || '',
+        'muted'
+      )
+    );
+
+    card.append(detail);
+
+    score.append(card);
+  }
+
+
+  /* STATISTICS */
+
+  const stats = $('stats');
+
+  stats.replaceChildren();
+
+  for (const [label, count] of Object.entries(counts)) {
+
+    const card = el(
+      'div',
+      undefined,
+      'stat'
+    );
+
+    card.append(
+      el('strong', count),
+      el('span', label)
+    );
+
+    stats.append(card);
+  }
+
+
+  /* FINDINGS */
+
+  const list = $('findings');
+
+  list.replaceChildren();
+
+  const findings = data.findings || [];
+
+  if (!findings.length) {
+
+    list.append(
+      el(
+        'p',
+        'No issues detected by these automated checks. Manual testing is still needed.',
+        'muted'
+      )
+    );
+
+  }
+
+  for (const f of findings) {
+
+    const row = el(
+      'article',
+      undefined,
+      'finding'
+    );
+
+    const title = el('h3');
+
+    title.append(
+      el(
+        'span',
+        f.impact || 'unknown',
+        'badge ' + (f.impact || '')
+      ),
+
+      document.createTextNode(
+        f.rule || 'Accessibility issue'
+      )
+    );
+
+    row.append(
+      title,
+
+      el(
+        'code',
+        f.element || ''
+      ),
+
+      el(
+        'p',
+        f.message || ''
+      ),
+
+      el(
+        'p',
+        'Suggested fix: ' +
+        (f.fix || 'Review this element.')
+      )
+    );
+
+    list.append(row);
+  }
+
+}
+
+
+/* SCAN FORM */
+
+$('scanform').addEventListener(
+  'submit',
+  async e => {
+
+    e.preventDefault();
+
+    const btn = $('scanbtn');
+
+    btn.disabled = true;
+
+    $('status').textContent =
+      'Scanning webpage…';
+
+    $('status').className = '';
+
+    try {
+
+      const res = await fetch(
+        '/api/scan',
+        {
+          method: 'POST',
+
+          headers: {
+            'Content-Type': 'application/json'
+          },
+
+          body: JSON.stringify({
+            url: $('url').value
+          })
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+
+        throw new Error(
+          data.error || 'Scan failed'
+        );
+
+      }
+
+      renderReport(data);
+
+      history.unshift({
+        at: new Date().toISOString(),
+        report: data
+      });
+
+      history = history.slice(0, 20);
+
+      save();
+
+      renderHistory();
+
+      $('status').textContent =
+        `Scan complete: ${data.findings.length} findings.`;
+
+      $('results').scrollIntoView({
+        behavior: 'smooth'
+      });
+
+    } catch (err) {
+
+      $('status').textContent =
+        err.message || 'Something went wrong.';
+
+      $('status').className = 'error';
+
+    } finally {
+
+      btn.disabled = false;
+
+    }
+
+  }
+);
+
+
+/* DEMO */
+
+$('demo').addEventListener(
+  'click',
+  async () => {
+
+    const btn = $('demo');
+
+    btn.disabled = true;
+
+    $('status').textContent =
+      'Scanning bundled example…';
+
+    $('status').className = '';
+
+    try {
+
+      const res = await fetch(
+        '/api/demo',
+        {
+          method: 'POST',
+
+          headers: {
+            'Content-Type': 'application/json'
+          },
+
+          body: '{}'
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+
+        throw new Error(
+          data.error || 'Demo scan failed'
+        );
+
+      }
+
+      renderReport(data);
+
+      $('status').textContent =
+        `Example complete: ${data.findings.length} findings.`;
+
+      $('results').scrollIntoView({
+        behavior: 'smooth'
+      });
+
+    } catch (err) {
+
+      $('status').textContent =
+        err.message || 'Something went wrong.';
+
+      $('status').className = 'error';
+
+    } finally {
+
+      btn.disabled = false;
+
+    }
+
+  }
+);
+
+
+/* DOWNLOAD JSON */
+
+$('export').addEventListener(
+  'click',
+  () => {
+
+    if (!current) return;
+
+    const file = new Blob(
+      [
+        JSON.stringify(
+          current,
+          null,
+          2
+        )
+      ],
+      {
+        type: 'application/json'
+      }
+    );
+
+    const a =
+      document.createElement('a');
+
+    a.href =
+      URL.createObjectURL(file);
+
+    a.download =
+      'accessibility-report.json';
+
+    a.click();
+
+    setTimeout(
+      () => URL.revokeObjectURL(a.href),
+      1000
+    );
+
+  }
+);
+
+
+/* DOWNLOAD CSV */
+
+$('csv').addEventListener(
+  'click',
+  () => {
+
+    if (!current) return;
+
+    const quote = v => {
+
+      let cell = String(v ?? '');
+
+      /*
+       Prevent CSV formula injection.
+      */
+
+      if (/^[\s]*[=+@-]/.test(cell)) {
+        cell = "'" + cell;
+      }
+
+      return '"' +
+        cell.replaceAll('"', '""') +
+        '"';
+
+    };
+
+    const rows = [
+      [
+        'URL',
+        'Basic score',
+        'Rule',
+        'Severity',
+        'Element',
+        'Issue',
+        'Suggested fix'
+      ]
+        .map(quote)
+        .join(',')
+    ];
+
+    for (const f of current.findings || []) {
+
+      rows.push(
+        [
+          current.url,
+          current.score?.value ?? '',
+          f.rule,
+          f.impact,
+          f.element,
+          f.message,
+          f.fix
+        ]
+          .map(quote)
+          .join(',')
+      );
+
+    }
+
+    const blob = new Blob(
+      [
+        '\uFEFF' +
+        rows.join('\r\n')
+      ],
+      {
+        type: 'text/csv;charset=utf-8'
+      }
+    );
+
+    const a =
+      document.createElement('a');
+
+    a.href =
+      URL.createObjectURL(blob);
+
+    a.download =
+      'accessibility-report.csv';
+
+    a.click();
+
+    setTimeout(
+      () => URL.revokeObjectURL(a.href),
+      1000
+    );
+
+  }
+);
+
+
+/* CLEAR HISTORY */
+
+$('clear').addEventListener(
+  'click',
+  () => {
+
+    if (
+      !confirm(
+        'Clear saved scan history?'
+      )
+    ) {
+      return;
+    }
+
+    history = [];
+
+    save();
+
+    renderHistory();
+
+  }
+);
+
+
+/* INITIAL HISTORY */
+
+renderHistory();
+
+</script>
+
+</body>
+</html>
+

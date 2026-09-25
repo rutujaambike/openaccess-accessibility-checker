@@ -38,7 +38,4 @@ class ScannerTests(unittest.TestCase):
         with patch('scanner.socket.getaddrinfo',return_value=[(None,None,None,None,('1.1.1.1',0)),(None,None,None,None,('192.168.0.1',0))]):
             with self.assertRaises(ScanError): public_addresses('example.com')
 
-    def test_safety_is_not_accessibility(self):
-        self.assertIn('HTTP',safety_signals('http://example.com/')['signals'][0])
-        self.assertEqual('No simple URL warnings',safety_signals('https://example.com/')['status'])
 if __name__=='__main__':unittest.main()
